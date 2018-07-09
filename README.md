@@ -3,6 +3,11 @@
 ## Compile
 first copy and edit the `src/config.h.sample` file to `src/config.h`
 
+## Notice
+The code crashes if you run it on 80MHz CPU frequency, you have to switch to 160MHz to stabilize the program.
+
+`board_build.f_cpu = 160000000L` in `platformio.ini`
+
 ## Screenshot
 ![](./img/screenshot.png)
 
