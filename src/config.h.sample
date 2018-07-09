@@ -1,0 +1,22 @@
+// Config File
+
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+
+#include <Arduino.h>
+
+// your ntp server name
+#define NTP_SERVER_NAME "fritz.box"
+#define NTP_TIME_SHIFT  7200
+
+// LED MODE = 0 => LED 'low' is ON, LED MODE = 1 => LED 'high' is ON
+#define LED_MODE  0
+
+#define LED_ON (LED_MODE ^ 0)
+#define LED_OFF (LED_MODE ^ 1)
+
+const char* ssid = "<your ssid>";
+const char* password = "<your wifi password>";
+const int led = D4; // D4 is the LED pin for WEOMS D1 mini pro
+
+#endif
