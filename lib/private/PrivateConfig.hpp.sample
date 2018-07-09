@@ -1,0 +1,28 @@
+// Config File
+
+#ifndef __PRIVATE_CONFIG_HPP__
+#define __PRIVATE_CONFIG_HPP__
+
+#include <Arduino.h>
+
+#define APP_NAME "ESP8266 HTTPS Sample server"
+#define APP_VERSION "0.0.6"
+
+#define OTA_HOSTNAME  "test1"
+#define OTA_PASSWORD  "otapass"
+
+#define NTP_SERVER_NAME "0.pool.ntp.org"
+#define NTP_TIME_SHIFT  7200
+
+// LED MODE = 0 => LED 'low' is ON, LED MODE = 1 => LED 'high' is ON
+#define LED_MODE  0
+
+#define LED_ON (LED_MODE ^ 0)
+#define LED_OFF (LED_MODE ^ 1)
+
+#define WIFI_SSID "<your wifi ssid>"
+#define WIFI_PASS "<your wifi password>"
+
+#define BOARD_LED D4
+
+#endif

@@ -14,10 +14,15 @@
 #include <WiFiClient.h>
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
+#include <OtaHandler.hpp>
+#include <PrivateConfig.hpp>
 
-#include "config.h"
 #include "test1.local.crt.h"
 #include "test1.local.key.h"
+
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASS;
+const int led = BOARD_LED;
 
 BearSSL::ESP8266WebServerSecure server(443);
 time_t now = 0l;
@@ -103,7 +108,7 @@ void setup(void)
 
   showChipInfo();
 
-  Serial.println("\nHTTPS Server Sample");
+  Serial.println("\n" APP_NAME ", Version " APP_VERSION );
   Serial.println( "Build date: " __DATE__ " " __TIME__  );
 
   Serial.print( "Connecting WiFi " );
@@ -127,7 +132,7 @@ void setup(void)
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
 
-  if (MDNS.begin("test1"))
+  if (MDNS.begin(OTA_HOSTNAME))
   {
     Serial.println("MDNS responder started");
   }
@@ -142,7 +147,6 @@ void setup(void)
   }
 
   Serial.println( " done." );
-
   Serial.println(ctime(&now));
 
   server.setRSACert(
@@ -162,10 +166,12 @@ void setup(void)
   Serial.println("HTTPS server started");
 
   MDNS.addService("_https", "_tcp", 443 );
-  MDNS.addServiceTxt("_https", "_tcp", "fw_name", "ESP8266 HTTPS SampleServer" );
+  MDNS.addServiceTxt("_https", "_tcp", "fw_name", APP_NAME );
+
 }
 
 void loop(void)
 {
   server.handleClient();
+  otaHandler.handle();
 }
