@@ -102,7 +102,7 @@ void setup(void)
   pinMode(led, OUTPUT);
   digitalWrite(led, LED_OFF);
 
-  delay(3000);
+  delay(3000); // wait for PlatformIO monitor
 
   Serial.println("\n");
 
@@ -111,8 +111,18 @@ void setup(void)
   Serial.println("\n" APP_NAME ", Version " APP_VERSION );
   Serial.println( "Build date: " __DATE__ " " __TIME__  );
 
+  ESP.eraseConfig();         // workaround for some older ESP8266-01
+  WiFi.mode( WIFI_OFF );     // the WiFi connect will take a few seconds
+  delay(500);                // longer but it is stable ;-)
+
   Serial.print( "Connecting WiFi " );
-  WiFi.begin(ssid, password);
+
+  WiFi.begin();                // initialize wifi interface
+
+  WiFi.hostname(OTA_HOSTNAME); // first set hostname, to find it in your
+                               // dhcp client list
+
+  WiFi.begin(ssid, password);  // connect in WIFI_STA mode to your WiFi network
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
@@ -122,30 +132,30 @@ void setup(void)
     digitalWrite( led, 1 ^ digitalRead(led));
   }
 
-
-
   digitalWrite(led, LED_OFF );
-
   configTime( NTP_TIME_SHIFT, 0, NTP_SERVER_NAME );
 
   Serial.println("\n");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
-  Serial.print("IP address: ");
+  Serial.print("Connected to \"");
+  Serial.print(ssid);
+  Serial.println("\"");
+  Serial.print("Hostname   : ");
+  Serial.println(WiFi.hostname());
+  Serial.print("IP address : ");
   Serial.println(WiFi.localIP());
-  Serial.print("Netmask: ");
+  Serial.print("Netmask    : ");
   Serial.println(WiFi.subnetMask());
-  Serial.print("Gateway: ");
+  Serial.print("Gateway    : ");
   Serial.println(WiFi.gatewayIP());
   Serial.println();
-  
+
   if (MDNS.begin(OTA_HOSTNAME))
   {
     Serial.println("MDNS responder started");
   }
 
+  // wait for ntp time
   Serial.print( "Wait for NTP sync " );
-
   while(!now)
   {
     time(&now);
