@@ -122,6 +122,8 @@ void setup(void)
     digitalWrite( led, 1 ^ digitalRead(led));
   }
 
+
+
   digitalWrite(led, LED_OFF );
 
   configTime( NTP_TIME_SHIFT, 0, NTP_SERVER_NAME );
@@ -131,7 +133,12 @@ void setup(void)
   Serial.println(ssid);
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-
+  Serial.print("Netmask: ");
+  Serial.println(WiFi.subnetMask());
+  Serial.print("Gateway: ");
+  Serial.println(WiFi.gatewayIP());
+  Serial.println();
+  
   if (MDNS.begin(OTA_HOSTNAME))
   {
     Serial.println("MDNS responder started");
