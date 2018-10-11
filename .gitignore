@@ -3,4 +3,6 @@
 .clang_complete
 .gcc-flags.json
 PrivateConfig.hpp
-.vscode
+.vscode/.browse.c_cpp.db*
+.vscode/c_cpp_properties.json
+.vscode/launch.json
