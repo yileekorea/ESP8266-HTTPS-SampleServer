@@ -27,6 +27,8 @@ const int led = BOARD_LED;
 BearSSL::ESP8266WebServerSecure server(443);
 time_t now = 0l;
 
+time_t lastTimestamp = 0l;
+
 void showChipInfo()
 {
   Serial.println("-- CHIPINFO --");
@@ -110,10 +112,17 @@ void setup(void)
 
   Serial.println("\n" APP_NAME ", Version " APP_VERSION );
   Serial.println( "Build date: " __DATE__ " " __TIME__  );
+  Serial.print( "Framework full version: " );
+  Serial.println( ESP.getFullVersion() );
 
   ESP.eraseConfig();         // workaround for some older ESP8266-01
+
   WiFi.mode( WIFI_OFF );     // the WiFi connect will take a few seconds
+  WiFi.persistent( false );
+
   delay(500);                // longer but it is stable ;-)
+
+  configTime( NTP_TIME_SHIFT, 0, NTP_SERVER_NAME );
 
   Serial.print( "Connecting WiFi " );
 
@@ -123,6 +132,8 @@ void setup(void)
                                // dhcp client list
 
   WiFi.begin(ssid, password);  // connect in WIFI_STA mode to your WiFi network
+  WiFi.setAutoConnect( true );
+  WiFi.setAutoReconnect( true );
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED)
@@ -133,7 +144,6 @@ void setup(void)
   }
 
   digitalWrite(led, LED_OFF );
-  configTime( NTP_TIME_SHIFT, 0, NTP_SERVER_NAME );
 
   Serial.println("\n");
   Serial.print("Connected to \"");
@@ -156,9 +166,9 @@ void setup(void)
 
   // wait for ntp time
   Serial.print( "Wait for NTP sync " );
-  while(!now)
+
+  while(( now = time(nullptr)) < 1550922262 )
   {
-    time(&now);
     Serial.print(".");
     delay(100);
   }
@@ -170,7 +180,7 @@ void setup(void)
     new BearSSLX509List(test1_local_crt_der,test1_local_crt_der_len),
     new BearSSLPrivateKey(test1_local_key_der,test1_local_key_der_len));
 
-  server.on("/", handleRoot);
+   server.on("/", handleRoot);
 
   server.on("/inline", []()
   {
@@ -184,11 +194,25 @@ void setup(void)
 
   MDNS.addService("_https", "_tcp", 443 );
   MDNS.addServiceTxt("_https", "_tcp", "fw_name", APP_NAME );
-
 }
+
+
 
 void loop(void)
 {
-  server.handleClient();
-  otaHandler.handle();
+  time_t currentTimestamp = millis();
+  bool wifiIsConnected = WiFi.isConnected();
+
+  if( currentTimestamp - lastTimestamp >= 5000 )
+  {
+    Serial.printf( "(%ld) WiFi is connected = %s\n", currentTimestamp, ( currentTimestamp ) ? "true" : "false" );
+    lastTimestamp = currentTimestamp;
+  }
+  
+  if( wifiIsConnected )
+  {
+    server.handleClient();
+    otaHandler.handle();
+    MDNS.update();
+  }
 }
