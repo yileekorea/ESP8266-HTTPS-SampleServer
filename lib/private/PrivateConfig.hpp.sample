@@ -6,13 +6,13 @@
 #include <Arduino.h>
 
 #define APP_NAME "ESP8266 HTTPS Sample server"
-#define APP_VERSION "0.0.8"
+#define APP_VERSION "0.1.14"
 
 #define OTA_HOSTNAME  "test1"
 #define OTA_PASSWORD  "otapass"
 
-#define NTP_SERVER_NAME "0.pool.ntp.org"
-#define NTP_TIME_SHIFT  7200
+#define NTP_SERVER_NAME "pool.ntp.org"
+#define NTP_TIME_SHIFT  3600
 
 // LED MODE = 0 => LED 'low' is ON, LED MODE = 1 => LED 'high' is ON
 #define LED_MODE  0
