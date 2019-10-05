@@ -24,9 +24,10 @@ const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASS;
 const int led = BOARD_LED;
 
-BearSSL::ESP8266WebServerSecure server(443);
-time_t now = 0l;
+BearSSL::ESP8266WebServerSecure sslServer(443);
+ESP8266WebServer rServer(80);
 
+time_t now = 0l;
 time_t lastTimestamp = 0l;
 
 void showChipInfo()
@@ -62,9 +63,9 @@ void showChipInfo()
 void handleRoot()
 {
   digitalWrite(led, LED_ON);
-  IPAddress clientIpAddress = server.client().remoteIP();
+  IPAddress clientIpAddress = sslServer.client().remoteIP();
 
-  server.send(200, "text/plain", "Hello from esp8266 over HTTPS!");
+  sslServer.send(200, "text/plain", "Hello from esp8266 over HTTPS!");
 
   Serial.println();
   time(&now);
@@ -81,20 +82,27 @@ void handleNotFound()
   digitalWrite(led, LED_ON);
   String message = "File Not Found\n\n";
   message += "URI: ";
-  message += server.uri();
+  message += sslServer.uri();
   message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += (sslServer.method() == HTTP_GET) ? "GET" : "POST";
   message += "\nArguments: ";
-  message += server.args();
+  message += sslServer.args();
   message += "\n";
 
-  for (uint8_t i=0; i<server.args(); i++)
+  for (uint8_t i=0; i<sslServer.args(); i++)
   {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+    message += " " + sslServer.argName(i) + ": " + sslServer.arg(i) + "\n";
   }
 
-  server.send(404, "text/plain", message);
+  sslServer.send(404, "text/plain", message);
   digitalWrite(led, LED_OFF);
+}
+
+void redirectToHTTPS()
+{
+  Serial.println("Redirect to HTTPS");
+  rServer.sendHeader( "Location", String("https://") + rServer.hostHeader(), true );
+  rServer.send(302, "text/plain", "" );
 }
 
 void setup(void)
@@ -176,27 +184,30 @@ void setup(void)
   Serial.println( " done." );
   Serial.println(ctime(&now));
 
-  server.setRSACert(
-    new BearSSLX509List(test1_local_crt_der,test1_local_crt_der_len),
-    new BearSSLPrivateKey(test1_local_key_der,test1_local_key_der_len));
+  sslServer.setRSACert(
+    new BearSSL::X509List(test1_local_crt_der,test1_local_crt_der_len),
+    new BearSSL::PrivateKey(test1_local_key_der,test1_local_key_der_len)
+  );
 
-   server.on("/", handleRoot);
+  sslServer.on("/", handleRoot);
 
-  server.on("/inline", []()
+  sslServer.on("/inline", []()
   {
-    server.send(200, "text/plain", "this works as well");
+    sslServer.send(200, "text/plain", "this works as well");
   });
 
-  server.onNotFound(handleNotFound);
+  sslServer.onNotFound(handleNotFound);
+  rServer.onNotFound(redirectToHTTPS);
 
-  server.begin();
+  sslServer.begin();
   Serial.println("HTTPS server started");
+
+  rServer.begin();
+  Serial.println("HTTP server started");
 
   MDNS.addService("_https", "_tcp", 443 );
   MDNS.addServiceTxt("_https", "_tcp", "fw_name", APP_NAME );
 }
-
-
 
 void loop(void)
 {
@@ -211,8 +222,10 @@ void loop(void)
   
   if( wifiIsConnected )
   {
-    server.handleClient();
+    sslServer.handleClient();
+    rServer.handleClient();
     otaHandler.handle();
-    MDNS.update();
   }
+  
+  delay(10);
 }
