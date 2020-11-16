@@ -219,13 +219,13 @@ void loop(void)
     Serial.printf( "(%ld) WiFi is connected = %s\n", currentTimestamp, ( currentTimestamp ) ? "true" : "false" );
     lastTimestamp = currentTimestamp;
   }
-  
+
   if( wifiIsConnected )
   {
     sslServer.handleClient();
     rServer.handleClient();
     otaHandler.handle();
   }
-  
+
   delay(10);
 }
