@@ -81,14 +81,15 @@ install:
 - pip install -U platformio
 #- platformio lib install 567 562
 - platformio platform install espressif8266 --with-package tool-mkspiffs
-script:  
+
+script:
   - platformio --version
   - platformio run -e ESPWeb_deploy
   - platformio run -t buildfs -e ESPWeb_deploy
-  
+
   - RELEASE_VER="R.0.0.1"
-  - echo $TRAVIS_BRANCH / $RELEASE_VER  
-  
+  - echo $TRAVIS_BRANCH / $RELEASE_VER
+
 after_success:
   # CREATE GIT TAG
   - git config --global user.email "builds@travis-ci.com"
@@ -97,7 +98,7 @@ after_success:
   - echo -n $GIT_TAG > public/version
   - git commit -m "Set build VERSION number" public/version
   - git tag $GIT_TAG -a -m "Generated tag from TravisCI build $TRAVIS_BUILD_NUMBER"
-  - git push --quiet https://$GITHUBKEY@github.com/yileekorea/ESP-main $GIT_TAG > /dev/null 2>&1
+  - git push --quiet https://$GITHUBKEY@github.com/yileekorea/ESP8266-HTTPS-SampleServer $GIT_TAG > /dev/null 2>&1
   - echo $TRAVIS_TAG
 
 deploy:
@@ -115,4 +116,3 @@ deploy:
 
 api-key:
     secure: kIx1qdKzZ3rSrWkjYuQZ6VxUF6+GGnSDRz3QqdglN1LehdhI9XSEDiJ46SCHJWWoHAXeckJMz4BbP9wcSAJQzwfxQKd9uJNCF/er/2LwzQ68i5/XSLuZtHm/aoHA10N6wQV1cX1ZTPZnXJ235ScrMfPabTjsxjtpLvox0mwmphyNmryegVwA6HI66DPw3niEAPqRvQ66/9+bZmQVHonVzp2HDDREGSUNPuD9nD5u5xrsKyGR4sZ0SL0kr5gF89C8FmeNZ6J4JR+pt1tzczomdhCz1SfQqGWCUKPhbAqT2VpV8Npqug56fWHDX3RHOnm3FFnup8TrfA1mmAfqXHBPu5kmatcQUCYs/hxKC1HxghSbx1LgflZ6etgK3hn3b+Y9fPWcnvJKfGtZ9zbcu0MzHRjPTD7382xooB/+tk0rkExIDwjyW2d1FsngtqVTaubFCwFGXrrDfuiP9UAHjOZv1XpMKqAQ5TYMyhIrGxqm7oRxT5CLdb3/G7l5ESX2J5LlF5AWsMx07tWdRhwgs6QuGO3SXkJZrKhwKOi/re5P1f3yljdGK0HDSabaxKvLWb+2CnlCqySp+y+yvy1cs3nsvb3fd/E64MFjJBGupxAUTnagdEHJRJaiRs05e/eROKTGIfeH/CCXT7nn9E9/3TuYjM1d5OOkSogTyfcOA4rRm7o=
-      
