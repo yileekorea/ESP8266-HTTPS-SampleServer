@@ -11,6 +11,7 @@
 #define OTA_HOSTNAME  "test1"
 #define OTA_PASSWORD  "otapass"
 
+//add ntp
 #define NTP_SERVER_NAME "pool.ntp.org"
 #define NTP_TIME_SHIFT  3600
 
@@ -20,8 +21,8 @@
 #define LED_ON (LED_MODE ^ 0)
 #define LED_OFF (LED_MODE ^ 1)
 
-#define WIFI_SSID "<your wifi ssid>"
-#define WIFI_PASS "<your wifi password>"
+#define WIFI_SSID "dd-wrt"
+#define WIFI_PASS "!234567890"
 
 #define BOARD_LED D4
 
