@@ -110,8 +110,8 @@ deploy:
   - ".pio/build/ESPWeb_deploy/spiffs.bin"
 
   on:
-    repo: yileekorea/ESP8266-HTTPS-SampleServer
-#    repo: yileekorea/ESP-main
+#    repo: yileekorea/ESP8266-HTTPS-SampleServer
+    repo: yileekorea/ESP-main-i2c
     all_branches: true
     condition: $RELEASE_VER =~ ^(R.)[0-9]+\.[0-9]+\.[0-9]+$
 
